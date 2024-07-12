@@ -73,7 +73,7 @@ export type CNPJ = {
   numero: string;
   bairro: string;
   municipio: string;
-  uf: UF;
+  uf: string;
   atividade_principal: {
     codigo: string;
     descricao: string;
