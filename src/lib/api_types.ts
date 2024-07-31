@@ -10,7 +10,7 @@ type Extras = {
   somente_mei: boolean;
 };
 
-type SituacaoCadastral =
+export type SituacaoCadastral =
   | "ATIVA"
   | "BAIXADA"
   | "INAPTA"
@@ -81,6 +81,23 @@ export type CNPJ = {
   cnpj_mei: boolean;
   versao: string;
 };
+
+export type FormattedCNPJ = {
+  CNPJ: string;
+  "CNPJ Raíz": string;
+  "Matriz ou filial": "MATRIZ" | "FILIAL";
+  "Razão Social": string;
+  "Nome Fantasia": string;
+  "Data de abertura": string;
+  "Situacao cadastral": SituacaoCadastral;
+  "Logradouro": string;
+  "Número": string;
+  "Bairro": string;
+  "Município": string;
+  "UF": string;
+  "Atividade Principal": string;
+  "CNPJ MEI?": "SIM" | "NÃO";
+}
 
 export type ResponseData = {
   success: boolean;
