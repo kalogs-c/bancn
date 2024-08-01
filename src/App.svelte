@@ -176,14 +176,6 @@
         placeholder="Municipio"
         label="Municipio"
       />
-      <CompleteInput
-        selectedStore={MunicipiosWritable}
-        values={["123", "456", "789"]}
-        displayFunction={(m) => ""}
-        selectedFieldFunction={(m) => m}
-        placeholder="Municipio"
-        label="Municipio"
-      />
     </div>
     <button
       class="btn btn-primary modal-button w-fit"
