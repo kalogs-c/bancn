@@ -77,20 +77,34 @@
   DDDsWritable.subscribe((ddd) => (ddds = ddd));
 
   let situacao_cadastral: SituacaoCadastral;
+  let capital_social_gte: string;
+  let capital_social_lte: string;
+  let data_abertura_gte: string;
+  let data_abertura_lte: string;
+
+  let tipo_de_empresa: "Todos" | "Somente MEI" | "Excluir MEI" = "Todos";
+  let matriz_filial: "Ambos" | "Matriz" | "Filial" = "Ambos";
+
+  let incluir_atividade_secundaria: boolean = false;
 
   const search = async (page: number) => {
+    const somente_mei = tipo_de_empresa == "Somente MEI";
+    const excluir_mei = tipo_de_empresa == "Excluir MEI";
+    const somente_matriz = matriz_filial == "Matriz";
+    const somente_filial = matriz_filial == "Filial";
+
     const result: ResponseData = await listCNPJ({
       page,
       extras: {
-        com_contato_telefonico: false,
-        com_email: false,
-        excluir_mei: false,
-        incluir_atividade_secundaria: false,
+        com_contato_telefonico: true,
+        com_email: true,
+        excluir_mei,
+        incluir_atividade_secundaria,
         somente_celular: false,
-        somente_filial: false,
+        somente_filial,
         somente_fixo: false,
-        somente_matriz: false,
-        somente_mei: false,
+        somente_matriz,
+        somente_mei,
       },
       query: {
         atividade_principal,
@@ -104,8 +118,14 @@
         uf: ufs,
       },
       range_query: {
-        capital_social: { lte: null, gte: null },
-        data_abertura: { lte: null, gte: null },
+        capital_social: {
+          lte: capital_social_lte || null,
+          gte: capital_social_gte || null,
+        },
+        data_abertura: {
+          lte: data_abertura_lte || null,
+          gte: data_abertura_gte || null,
+        },
       },
     });
 
@@ -118,7 +138,7 @@
     on:submit|preventDefault={() => {}}
     class="flex h-full max-w-full flex-col justify-center items-center gap-5"
   >
-    <div class="flex gap-5">
+    <div class="flex gap-5 items-center">
       <CompleteInput
         selectedStore={CNAEsWritable}
         values={CNAE}
@@ -135,18 +155,6 @@
         placeholder="Natureza Jurídica"
         label="Natureza Jurídica"
       />
-      <label class="form-control w-full max-w-xs">
-        <div class="label">
-          <span class="label-text"><strong>Situação Cadastral</strong></span>
-        </div>
-        <select bind:value={situacao_cadastral} class="select select-bordered">
-          <option selected>ATIVA</option>
-          <option>BAIXADA</option>
-          <option>INAPTA</option>
-          <option>SUSPENSA</option>
-          <option>NULA</option>
-        </select>
-      </label>
     </div>
     <div class="flex gap-5">
       <CompleteInput
@@ -176,6 +184,88 @@
         placeholder="Municipio"
         label="Municipio"
       />
+    </div>
+    <div class="flex gap-10">
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text"><strong>Data de abertura</strong></span>
+        </div>
+        <div class="join">
+          <input
+            type="date"
+            class="input input-bordered join-item"
+            bind:value={data_abertura_gte}
+            placeholder="A partir de..."
+          />
+          <input
+            type="date"
+            class="input input-bordered join-item"
+            bind:value={data_abertura_lte}
+            placeholder="Até..."
+          />
+        </div>
+      </label>
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text"><strong>Capital Social</strong></span>
+        </div>
+        <div class="join">
+          <input
+            class="input input-bordered join-item w-32"
+            bind:value={capital_social_gte}
+            placeholder="A partir de..."
+          />
+          <input
+            class="input input-bordered join-item w-32"
+            bind:value={capital_social_lte}
+            placeholder="Até..."
+          />
+        </div>
+      </label>
+    </div>
+    <div class="flex gap-5">
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text"><strong>Situação Cadastral</strong></span>
+        </div>
+        <select bind:value={situacao_cadastral} class="select select-bordered">
+          <option selected>ATIVA</option>
+          <option>BAIXADA</option>
+          <option>INAPTA</option>
+          <option>SUSPENSA</option>
+          <option>NULA</option>
+        </select>
+      </label>
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text"><strong>Tipo de empresa</strong></span>
+        </div>
+        <select bind:value={tipo_de_empresa} class="select select-bordered">
+          <option selected>Todos</option>
+          <option>Apenas MEI</option>
+          <option>Excluir MEI</option>
+        </select>
+      </label>
+      <label class="form-control w-full max-w-xs">
+        <div class="label">
+          <span class="label-text"><strong>Matriz ou filial?</strong></span>
+        </div>
+        <select bind:value={matriz_filial} class="select select-bordered">
+          <option selected>Ambos</option>
+          <option>Matriz</option>
+          <option>Filial</option>
+        </select>
+      </label>
+      <div class="form-control w-52">
+        <label class="label cursor-pointer">
+          <span class="label-text">Incluir Atividade Secundária</span>
+          <input
+            bind:checked={incluir_atividade_secundaria}
+            type="checkbox"
+            class="toggle toggle-primary"
+          />
+        </label>
+      </div>
     </div>
     <button
       class="btn btn-primary modal-button w-fit"

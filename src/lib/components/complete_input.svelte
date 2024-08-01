@@ -52,6 +52,8 @@
     selected = !selected.includes(selectedField)
       ? [...selected, selectedField]
       : selected;
+
+    inputValue = "";
   };
 
   const removeItem = (item: string) => {
