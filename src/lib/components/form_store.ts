@@ -4,3 +4,4 @@ export const CNAEsWritable: Writable<string[]> = writable([]);
 export const NJsWritable: Writable<string[]> = writable([]);
 export const UFsWritable: Writable<string[]> = writable([]);
 export const DDDsWritable: Writable<string[]> = writable([]);
+export const MunicipiosWritable: Writable<string[]> = writable([]);

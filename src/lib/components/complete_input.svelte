@@ -18,6 +18,7 @@
   let openSelectedDropdown = false;
 
   let selected: string[] = [];
+  selectedStore.subscribe((s) => (selected = s));
 
   const filterValues = () => {
     const normalizeInput = inputValue.toLowerCase().normalize();
@@ -94,6 +95,7 @@
           {selected.length}
         </button>
       {/if}
+
       <input
         class={`input input-bordered ${width} max-w-xs`}
         type="text"
@@ -102,6 +104,7 @@
         on:input={filterValues}
         on:focusin={onFocusIn}
         on:focusout={onFocusOut}
+        disabled={values.length == 0}
       />
     </div>
   </label>

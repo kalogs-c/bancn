@@ -1,4 +1,4 @@
-import type { CNAE_NaturezaJuridica, CNPJ, FormattedCNPJ, RequestPayload, ResponseData } from "./api_types";
+import type { CNAE_NaturezaJuridica, CNPJ, FormattedCNPJ, Municipio, RequestPayload, ResponseData } from "./api_types";
 
 const API_BASE_URL = "https://api.casadosdados.com.br/v4/public/cnpj";
 const DEFAULT_HEADERS = {
@@ -17,6 +17,8 @@ const DEFAULT_HEADERS = {
 }
 
 const SEARCH_URL = "https://api.casadosdados.com.br/v2/public/cnpj/search"
+
+const MUNICIPIO_URL = "https://api.casadosdados.com.br/v4/public/cnpj/busca/municipio/"
 
 export async function listCNAE(): Promise<CNAE_NaturezaJuridica[]> {
   const cnaeList = fetch(API_BASE_URL + "/busca/cnae", { headers: DEFAULT_HEADERS })
@@ -63,4 +65,12 @@ export async function listCNPJ(payload: RequestPayload): Promise<ResponseData> {
   }
 
   return cnpjList;
+}
+
+export async function listMunicipios(uf: string): Promise<Municipio[]> {
+  const municipiosList = fetch(MUNICIPIO_URL + uf, { headers: DEFAULT_HEADERS })
+    .then(response => response.json())
+    .catch(error => error);
+
+  return municipiosList;
 }

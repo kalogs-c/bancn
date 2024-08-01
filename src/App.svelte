@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import type {
     CNAE_NaturezaJuridica,
+    Municipio,
     ResponseData,
     SituacaoCadastral,
   } from "./lib/api_types";
@@ -9,6 +10,7 @@
     listCNAE,
     listCNPJ,
     listNaturezaJuridica,
+    listMunicipios,
   } from "./lib/casa_dos_dados";
   import CompleteInput from "./lib/components/complete_input.svelte";
   import Estados from "./lib/UF.json";
@@ -19,12 +21,14 @@
     NJsWritable,
     UFsWritable,
     DDDsWritable,
+    MunicipiosWritable,
   } from "./lib/components/form_store";
 
   let isModalOpen = false;
 
   let CNAE: CNAE_NaturezaJuridica[] = [];
   let NaturezaJuridica: CNAE_NaturezaJuridica[] = [];
+  let Municipios: Municipio[] = [];
 
   onMount(async () => {
     [CNAE, NaturezaJuridica] = await Promise.all([
@@ -39,8 +43,35 @@
   let natureza_juridica: string[] = [];
   NJsWritable.subscribe((nj) => (natureza_juridica = nj));
 
+  let municipiosSelected: string[] = [];
+  MunicipiosWritable.subscribe((m) => (municipiosSelected = m));
+
   let ufs: string[] = [];
-  UFsWritable.subscribe((uf) => (ufs = uf));
+  UFsWritable.subscribe(async (uf) => {
+    // Adicionar pq tem mais selecionados
+    if (uf.length > ufs.length) {
+      Municipios = [
+        ...Municipios,
+        ...(await listMunicipios(uf[uf.length - 1])),
+      ];
+    } else if (uf.length < ufs.length) {
+      // Remover pq tem menos selecionados
+      const differentUf = ufs.filter((u) => !uf.includes(u)).pop();
+      const toRemove = Municipios.filter((m) => m.uf == differentUf).map(
+        (m) => m.name,
+      );
+
+      if (toRemove.length > 0) {
+        Municipios = Municipios.filter((m) => m.uf != differentUf);
+
+        MunicipiosWritable.set(
+          municipiosSelected.filter((m) => !toRemove.includes(m)),
+        );
+      }
+    }
+
+    ufs = uf;
+  });
 
   let ddds: string[] = [];
   DDDsWritable.subscribe((ddd) => (ddds = ddd));
@@ -66,7 +97,7 @@
         bairro: [],
         cep: [],
         ddd: ddds,
-        municipio: [],
+        municipio: municipiosSelected,
         natureza_juridica,
         situacao_cadastral,
         termo: [],
@@ -104,8 +135,6 @@
         placeholder="Natureza Jurídica"
         label="Natureza Jurídica"
       />
-    </div>
-    <div class="flex gap-5">
       <label class="form-control w-full max-w-xs">
         <div class="label">
           <span class="label-text"><strong>Situação Cadastral</strong></span>
@@ -118,6 +147,8 @@
           <option>NULA</option>
         </select>
       </label>
+    </div>
+    <div class="flex gap-5">
       <CompleteInput
         selectedStore={DDDsWritable}
         values={Estados.UF.map((uf) => uf.ddd)
@@ -136,6 +167,22 @@
         selectedFieldFunction={(uf) => uf.sigla}
         placeholder="Estado"
         label="Estado (UF)"
+      />
+      <CompleteInput
+        selectedStore={MunicipiosWritable}
+        values={Municipios}
+        displayFunction={(m) => m.name}
+        selectedFieldFunction={(m) => m.name}
+        placeholder="Municipio"
+        label="Municipio"
+      />
+      <CompleteInput
+        selectedStore={MunicipiosWritable}
+        values={["123", "456", "789"]}
+        displayFunction={(m) => ""}
+        selectedFieldFunction={(m) => m}
+        placeholder="Municipio"
+        label="Municipio"
       />
     </div>
     <button
